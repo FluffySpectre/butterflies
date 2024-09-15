@@ -1,3 +1,6 @@
+using System;
+using Cinemachine;
+using DG.Tweening;
 using UnityEngine;
 
 public class HandController : MonoBehaviour
@@ -20,6 +23,7 @@ public class HandController : MonoBehaviour
     public Vector3 handOnDomePosition;
     public Vector3 handInTheSkyPosition;
     public Light spotLight;
+    public CinemachineVirtualCamera mainCamera;
 
     private Vector3 initialPosition;
     private Quaternion initialRotation; // Anfangsrotation
@@ -37,10 +41,16 @@ public class HandController : MonoBehaviour
     private Vector3 liftEndPosition;
     public AnimationCurve liftCurve;
 
+    private float initialCamDampeningX, initialCamDampeningY, initialCamDampeningZ;
+
     void Start()
     {
         initialPosition = transform.position;
         initialRotation = transform.rotation;
+
+        initialCamDampeningX = mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping;
+        initialCamDampeningY = mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping;
+        initialCamDampeningZ = mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping;
     }
 
     void Update()
@@ -106,6 +116,10 @@ public class HandController : MonoBehaviour
             // Anfangs- und Zielrotation festlegen
             initialRotation = transform.rotation;
             targetRotation = initialRotation * Quaternion.Euler(0, 0, 180f);
+
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 6f;
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 6f;
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = 6f;
         }
 
         liftTimer += Time.deltaTime / liftDuration;
@@ -122,10 +136,26 @@ public class HandController : MonoBehaviour
 
         if (liftTimer >= 1f)
         {
-            // currentState = HandState.Throwing;
+            var lerpedDampingX = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping, initialCamDampeningX, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = lerpedDampingX;
 
-            // TEMP
-            currentState = HandState.SettingDown;
+            var lerpedDampingY = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping, initialCamDampeningY, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = lerpedDampingY;
+
+            var lerpedDampingZ = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping, initialCamDampeningZ, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = lerpedDampingZ;
+
+            if (Math.Abs(lerpedDampingX - initialCamDampeningX) < 0.1f)
+            {
+                // currentState = HandState.Throwing;
+
+                // TEMP
+                currentState = HandState.SettingDown;
+
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = initialCamDampeningX;
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = initialCamDampeningY;
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = initialCamDampeningZ;
+            }
         }
     }
 

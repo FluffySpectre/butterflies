@@ -8,6 +8,8 @@ public class Spawner : MonoBehaviour
     public float timeBetweenSpawns = 1f;
     public bool oneShot;
     public Vector3 spawnArea = new(1, 1, 1);
+    public float spawnRadius = 10f;
+    public bool placeOnGround = false;
     public Transform parentTransform;
 
     private bool spawned = false;
@@ -33,12 +35,24 @@ public class Spawner : MonoBehaviour
 
     private Vector3 PickARandomPosition()
     {
-        return new Vector3(Random.Range(-spawnArea.x / 2f, spawnArea.x / 2f), Random.Range(-spawnArea.y / 2f, spawnArea.y / 2f), Random.Range(-spawnArea.z / 2f, spawnArea.z / 2f)) + transform.position;
+        var pos = Random.insideUnitSphere * spawnRadius + transform.position;
+
+        if (pos.y < 0f)
+        {
+            pos = new(pos.x, transform.position.y + Mathf.Abs(pos.y), pos.z);
+        }
+
+        if (placeOnGround)
+        {
+            pos = new(pos.x, 0f, pos.z);
+        }
+
+        return pos;
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position, spawnArea);
+        Gizmos.DrawWireSphere(transform.position, spawnRadius);
     }
 }
