@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class AIPlayerInput : MonoBehaviour
 {
-    [SerializeField] private float minTimeUntilPickANewTarget = 5f;
-    [SerializeField] private float maxTimeUntilPickANewTarget = 10f;
+    public float minTimeUntilPickANewTarget = 5f;
+    public float maxTimeUntilPickANewTarget = 10f;
 
     private ButterflyController butterflyController;
     private float pickNextTargetTime = -1f;
@@ -32,9 +32,9 @@ public class AIPlayerInput : MonoBehaviour
     private void PickNewTargetPosition()
     {
         pickNextTargetTime = Time.time + Random.Range(minTimeUntilPickANewTarget, maxTimeUntilPickANewTarget);
-        targetPosition = new Vector3(
+        targetPosition = transform.parent.position + new Vector3(
             Random.Range(-375f, 375f),
-            Random.Range(15f, 80f),
+            transform.parent.rotation.z < 0f ? Random.Range(-15f, -80f) : Random.Range(15f, 80f),
             Random.Range(-375f, 375f)
         );
     }

@@ -5,14 +5,12 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public ButterflyController playerController;
-    public Transform hand;
-    public Vector3 handOnDomePosition;
-    public Vector3 handInTheSkyPosition;
-    public float handFallSpeed = 5f;
-
+    public GameObject hand;
     public event Action OnHandUpdated;
-    
-    public float CurrentHandPosition { get; private set; }
+    public float timeBeforeFirstHandEvent = 20f;
+
+    private bool handEventTriggered = false;
+    private ButterflyController[] butterflies;
 
     // Start is called before the first frame update
     void Start()
@@ -28,14 +26,48 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // UpdateHand();
+        if (butterflies == null || butterflies.Length < 3)
+        {
+            FindAllAIButterflies();
+        }
+
+        if (!handEventTriggered && Time.time > timeBeforeFirstHandEvent)
+        {
+            handEventTriggered = true;
+
+            ActivateHand();
+            SetButterflyAlertState(true);
+        }
     }
  
-    private void UpdateHand()
+    private void ActivateHand()
     {
-        CurrentHandPosition += Time.deltaTime / handFallSpeed;
-        hand.position = Vector3.Lerp(handInTheSkyPosition, handOnDomePosition, CurrentHandPosition);
-        OnHandUpdated?.Invoke();
+        hand.SetActive(true);
+    }
+
+    private void FindAllAIButterflies()
+    {
+        butterflies = FindObjectsOfType<ButterflyController>();
+        Debug.Log("Found butterflies: " + butterflies.Length);
+    }
+
+    private void SetButterflyAlertState(bool alerted)
+    {
+        for (int i = 0; i < butterflies.Length; i++)
+        {
+            var b = butterflies[i];
+
+            if (b.TryGetComponent(out AIPlayerInput aiPlayerInput))
+            {
+                b.speed = 100f;
+                b.turnSpeed = 100f;
+                b.pitchSpeed = 90f;
+                b.maxWingFlapSpeed = 20f;
+
+                aiPlayerInput.minTimeUntilPickANewTarget = 1f;
+                aiPlayerInput.maxTimeUntilPickANewTarget = 5f;
+            }
+        }
     }
 
     public void OnApproachFlower(GameObject flower, GameObject interactor) 

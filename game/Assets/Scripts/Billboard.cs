@@ -6,7 +6,6 @@ public class Billboard : MonoBehaviour
 
     void Update()
     {
-        // Rotate the billboard to face the camera around the rotationAxis
-        transform.LookAt(Camera.main.transform.position + rotationAxis * -2f, rotationAxis);
+        transform.LookAt(Camera.main.transform.position + rotationAxis * -2f, transform.parent.up);
     }
 }
