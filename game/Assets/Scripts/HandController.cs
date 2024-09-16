@@ -40,6 +40,8 @@ public class HandController : MonoBehaviour
     private Vector3 liftEndPosition;
     public AnimationCurve liftCurve;
 
+    public ParticleSystem groundParticles;
+
     private float initialCamDampeningX, initialCamDampeningY, initialCamDampeningZ;
 
     void Start()
@@ -162,6 +164,8 @@ public class HandController : MonoBehaviour
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = initialCamDampeningX;
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = initialCamDampeningY;
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = initialCamDampeningZ;
+
+                groundParticles.Play();
             }
         }
     }
