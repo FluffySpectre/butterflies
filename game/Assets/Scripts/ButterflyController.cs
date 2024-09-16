@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class ButterflyController : MonoBehaviour
 {
     // Movement parameters
@@ -46,6 +47,15 @@ public class ButterflyController : MonoBehaviour
     private bool cycleComplete;
     private float hoverAmplitude;
 
+    // Rigidbody
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+    }
+
     public void ApplyInput(float horizontal, float vertical)
     {
         horizontalInput = horizontal;
@@ -56,13 +66,13 @@ public class ButterflyController : MonoBehaviour
     {
         if (controllable)
         {
-            // ReadInput();
+            rb.isKinematic = false;
             HandleMovement();
-            ApplyRandomJitter();
         }
         else
         {
             ResetInput();
+            rb.isKinematic = true;
         }
 
         AnimateWings();
@@ -85,17 +95,19 @@ public class ButterflyController : MonoBehaviour
 
     private void Rotate()
     {
-        // Yaw rotation
-        transform.Rotate(Vector3.up, horizontalInput * turnSpeed * Time.deltaTime);
+        // Yaw rotation (around the Y axis)
+        var yawRotation = Quaternion.Euler(0f, horizontalInput * turnSpeed * Time.deltaTime, 0f);
+        rb.MoveRotation(rb.rotation * yawRotation);
 
-        // Pitch rotation
+        // Pitch rotation (up and down)
         if (Mathf.Abs(verticalInput) > 0)
         {
-            var currentPitch = transform.eulerAngles.x;
+            var currentPitch = rb.rotation.eulerAngles.x;
             currentPitch = (currentPitch > 180f) ? currentPitch - 360f : currentPitch;
 
             var newPitch = Mathf.Clamp(currentPitch - verticalInput * pitchSpeed * Time.deltaTime, -maxPitch, maxPitch);
-            transform.rotation = Quaternion.Euler(newPitch, transform.eulerAngles.y, 0f);
+            var pitchRotation = Quaternion.Euler(newPitch, rb.rotation.eulerAngles.y, 0f);
+            rb.MoveRotation(pitchRotation);
         }
         else
         {
@@ -105,18 +117,20 @@ public class ButterflyController : MonoBehaviour
 
     private void LevelOut()
     {
-        var targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime);
+        var targetRotation = Quaternion.Euler(0f, rb.rotation.eulerAngles.y, 0f);
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime));
     }
 
     private void MoveForward()
     {
-        var movement = speed * Time.deltaTime * transform.forward;
-        movement += Time.deltaTime * windStrength * windDirection.normalized;
-        transform.Translate(movement, Space.World);
+        var movement = speed * transform.forward;
+        movement += windStrength * windDirection.normalized;
+        movement += GetRandomJitter();
+
+        rb.velocity = movement;
     }
 
-    private void ApplyRandomJitter()
+    private Vector3 GetRandomJitter()
     {
         var jitterOffset = new Vector3(
             (Mathf.PerlinNoise(Time.time * jitterFrequency, 0f) - 0.5f) * 2f,
@@ -124,7 +138,7 @@ public class ButterflyController : MonoBehaviour
             (Mathf.PerlinNoise(Time.time * jitterFrequency, Time.time * jitterFrequency) - 0.5f) * 2f
         ) * jitterStrength;
 
-        transform.position += jitterOffset;
+        return jitterOffset;
     }
 
     private void AnimateWings()
@@ -178,7 +192,7 @@ public class ButterflyController : MonoBehaviour
     private void ApplyHoverEffect()
     {
         hoverAmplitude = Mathf.Lerp(hoverAmplitude, verticalInput < 0f ? 0f : maxHoverAmplitude, Time.deltaTime * 2f);
-        
+
         var hoverOffset = wingFlapCurve.Evaluate(Mathf.PingPong(wingFlapTime, 1f)) * hoverAmplitude;
         model.localPosition = new Vector3(model.localPosition.x, hoverOffset, model.localPosition.z);
     }

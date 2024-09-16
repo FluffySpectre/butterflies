@@ -1680,6 +1680,7 @@ MonoBehaviour:
   allowedLayer:
     serializedVersion: 2
     m_Bits: 192
+  cooldownAfterTrigger: 15
 --- !u!1 &7561183300861597980
 GameObject:
   m_ObjectHideFlags: 0
