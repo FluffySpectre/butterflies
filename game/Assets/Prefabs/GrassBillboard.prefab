@@ -93,6 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1618243027976967218}
   - component: {fileID: 771520184466373787}
+  - component: {fileID: -7740256407072858285}
   m_Layer: 0
   m_Name: GrassBillboard
   m_TagString: Untagged
@@ -129,3 +130,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationAxis: {x: 0, y: 1, z: 0}
+--- !u!114 &-7740256407072858285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7111442330731230779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 889ecd44e2da84d47b857b5f9127e939, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleOffsetRange: {x: -0.25, y: 0.25}

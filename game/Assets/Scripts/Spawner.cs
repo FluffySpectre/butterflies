@@ -7,10 +7,10 @@ public class Spawner : MonoBehaviour
     public Vector3 randomRotationOnAxis = new(0, 1, 0);
     public float timeBetweenSpawns = 1f;
     public bool oneShot;
-    public Vector3 spawnArea = new(1, 1, 1);
     public float spawnRadius = 10f;
     public bool placeOnGround = false;
     public Transform parentTransform;
+    public LayerMask blockLayer;
 
     private bool spawned = false;
 
@@ -28,9 +28,24 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
-        var spawnPos = PickARandomPosition();
-        var rotation = Quaternion.Euler(randomRotationOnAxis * Random.Range(-180f, 180f));
-        Instantiate(prefabToSpawn, spawnPos, rotation, parentTransform);
+        var spawnPos = Vector3.zero;
+        var spawnPosFound = false;
+        var numTries = 5;
+        while (numTries-- > 0)
+        {
+            spawnPos = PickARandomPosition();
+            if (CheckPosition(spawnPos))
+            {
+                spawnPosFound = true;
+                break;
+            }
+        }
+
+        if (spawnPosFound)
+        {
+            var rotation = Quaternion.Euler(randomRotationOnAxis * Random.Range(-180f, 180f));
+            Instantiate(prefabToSpawn, spawnPos, rotation, parentTransform);
+        }
     }
 
     private Vector3 PickARandomPosition()
@@ -50,9 +65,20 @@ public class Spawner : MonoBehaviour
         return pos;
     }
 
+    private bool CheckPosition(Vector3 pos)
+    {
+        var checkRadius = 2f;
+        var colliders = Physics.OverlapSphere(pos, checkRadius, blockLayer);
+        if (colliders.Length > 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, spawnRadius);
     }
 }

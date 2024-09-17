@@ -12,12 +12,10 @@ public class ButterflyController : MonoBehaviour
     public float maxPitch = 45f;
     public bool controllable = true;
 
-    // Wing Transforms
-    [Header("Wing Transforms")]
-    public Transform leftTopWing;
-    public Transform leftBottomWing;
-    public Transform rightTopWing;
-    public Transform rightBottomWing;
+    // Wing & Body Transforms
+    [Header("Wing & Body Transforms")]
+    public Transform leftWing;
+    public Transform rightWing;
     public Transform body;
     public Transform model;
 
@@ -26,6 +24,7 @@ public class ButterflyController : MonoBehaviour
     public float maxWingFlapSpeed = 10f;
     public float wingFlapAngle = 30f;
     public AnimationCurve wingFlapCurve;
+    public float wingRotationAmplitude = 20f;
 
     // Wind and Jitter
     [Header("Wind and Jitter Settings")]
@@ -180,13 +179,16 @@ public class ButterflyController : MonoBehaviour
 
     private void SetWingRotation(float flapAngle)
     {
-        var leftRotation = Quaternion.Euler(0f, 0f, flapAngle);
-        var rightRotation = Quaternion.Euler(0f, 0f, -flapAngle);
+        var rotationAngle = Mathf.Sin(wingFlapTime * Mathf.PI * 2) * wingRotationAmplitude;
 
-        leftTopWing.localRotation = leftRotation;
-        leftBottomWing.localRotation = leftRotation;
-        rightTopWing.localRotation = rightRotation;
-        rightBottomWing.localRotation = rightRotation;
+        var verticalFlapLeft = Quaternion.Euler(0f, 0f, flapAngle);
+        var verticalFlapRight = Quaternion.Euler(0f, 0f, -flapAngle);
+
+        var baseRotationLeft = Quaternion.Euler(0f, rotationAngle, 0f);
+        var baseRotationRight = Quaternion.Euler(0f, -rotationAngle, 0f);
+
+        leftWing.localRotation = verticalFlapLeft * baseRotationLeft;
+        rightWing.localRotation = verticalFlapRight * baseRotationRight;
     }
 
     private void ApplyHoverEffect()
@@ -210,10 +212,8 @@ public class ButterflyController : MonoBehaviour
         var wingDeformationAngle = Mathf.Lerp(-30f, 0f, (windAlignment + 1f) / 2f) * windStrength;
 
         var deformationRotation = Quaternion.Euler(effect.z + wingDeformationAngle, 0f, effect.x);
-        leftTopWing.localRotation *= deformationRotation;
-        rightTopWing.localRotation *= deformationRotation;
-        leftBottomWing.localRotation *= deformationRotation;
-        rightBottomWing.localRotation *= deformationRotation;
+        leftWing.localRotation *= deformationRotation;
+        rightWing.localRotation *= deformationRotation;
     }
 
     private void AdjustBodyForWind()

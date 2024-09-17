@@ -10,6 +10,7 @@ public class HandController : MonoBehaviour
         Descending,
         Idle,
         Lifting,
+        Idle2,
         Throwing,
         SettingDown,
         Ascending
@@ -44,6 +45,9 @@ public class HandController : MonoBehaviour
 
     private float initialCamDampeningX, initialCamDampeningY, initialCamDampeningZ;
 
+    private float stateTimer;
+    private bool stateChanged;
+
     void Start()
     {
         initialPosition = transform.position;
@@ -69,6 +73,9 @@ public class HandController : MonoBehaviour
                 break;
             case HandState.Lifting:
                 Lift();
+                break;
+            case HandState.Idle2:
+                Idle2();
                 break;
             case HandState.Throwing:
                 ThrowAndCatch();
@@ -145,6 +152,9 @@ public class HandController : MonoBehaviour
 
         if (liftTimer >= 1f)
         {
+            transform.position = liftEndPosition;
+            transform.rotation = targetRotation;
+
             var lerpedDampingX = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping, initialCamDampeningX, Time.deltaTime * 2f);
             mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = lerpedDampingX;
 
@@ -159,46 +169,108 @@ public class HandController : MonoBehaviour
                 // currentState = HandState.Throwing;
 
                 // TEMP
-                currentState = HandState.SettingDown;
+                currentState = HandState.Idle2;
 
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = initialCamDampeningX;
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = initialCamDampeningY;
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = initialCamDampeningZ;
 
                 groundParticles.Play();
+
+                Debug.Log("Hand: Next state=Idle2");
             }
         }
+    }
+
+    void Idle2()
+    {
+        if (stateChanged)
+        {
+            stateChanged = false;
+            stateTimer = 0f;
+        }
+
+        // stateTimer += Time.deltaTime;
+
+        // if (stateTimer > 60f)
+        // {
+        //     stateChanged = true;
+        //     currentState = HandState.SettingDown;
+
+        //     Debug.Log("Hand: Next state=SettingsDown");
+        // }
     }
 
     void ThrowAndCatch() { /* ... */ }
     void SetDown()
     {
-        // if (hasLifted)
-        // {
-        //     domeTransform.SetParent(transform);
-        //     hasLifted = false;
-        //     liftStartPosition = handOnDomePosition;
-        //     liftEndPosition = handOnDomePosition + new Vector3(0, 20f, 0);
-        //     liftTimer = 0f;
+        if (hasLifted)
+        {
+            domeTransform.SetParent(transform);
+            hasLifted = false;
+            liftStartPosition = handOnDomePosition + new Vector3(0, 20f, 0);
+            liftEndPosition = handOnDomePosition;
+            liftTimer = 0f;
 
-        //     // Anfangs- und Zielrotation festlegen
-        //     initialRotation = transform.rotation;
-        //     targetRotation = initialRotation * Quaternion.Euler(0, 0, 180f);
-        // }
+            initialRotation = transform.rotation;
+            targetRotation = initialRotation * Quaternion.Euler(0, 0, 180f);
 
-        // liftTimer += Time.deltaTime / liftDuration;
-        // float curveValue = liftCurve.Evaluate(liftTimer);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = 0.1f;
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = 0.1f;
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = 0.1f;
+        }
 
-        // // Position interpolieren
-        // transform.position = Vector3.Lerp(liftStartPosition, liftEndPosition, curveValue);
+        liftTimer += Time.deltaTime / liftDuration;
+        float curveValue = liftCurve.Evaluate(liftTimer);
 
-        // // Rotation interpolieren
-        // transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, curveValue);
+        transform.position = Vector3.Lerp(liftStartPosition, liftEndPosition, curveValue);
 
-        // if (liftTimer >= 1f)
-        // {
-        //     currentState = HandState.Throwing;
-        // }
+        transform.rotation = Quaternion.Lerp(initialRotation, targetRotation, curveValue);
+
+        if (liftTimer >= 1f)
+        {
+            transform.position = liftEndPosition;
+            transform.rotation = targetRotation;
+
+            var lerpedDampingX = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping, initialCamDampeningX, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = lerpedDampingX;
+
+            var lerpedDampingY = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping, initialCamDampeningY, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = lerpedDampingY;
+
+            var lerpedDampingZ = Mathf.Lerp(mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping, initialCamDampeningZ, Time.deltaTime * 2f);
+            mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = lerpedDampingZ;
+
+            if (Math.Abs(lerpedDampingX - initialCamDampeningX) < 0.1f)
+            {
+                currentState = HandState.Ascending;
+
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = initialCamDampeningX;
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = initialCamDampeningY;
+                mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_ZDamping = initialCamDampeningZ;
+
+                groundParticles.Stop();
+
+                domeTransform.SetParent(null);
+                domeTransform.position = Vector3.zero;
+                domeTransform.localRotation = Quaternion.identity;
+
+                Debug.Log("Hand: Next state=Ascending");
+            }
+        }
     }
-    void Ascend() { /* ... */ }
+    void Ascend()
+    {
+        var targetPosition = handOutsidePosition;
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+        {
+            transform.position = targetPosition;
+
+            // currentState = HandState.Idle;
+
+            // Debug.Log("Hand: Next state=Idle");
+        }
+    }
 }
