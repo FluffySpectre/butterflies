@@ -190,15 +190,15 @@ public class HandController : MonoBehaviour
             stateTimer = 0f;
         }
 
-        // stateTimer += Time.deltaTime;
+        stateTimer += Time.deltaTime;
 
-        // if (stateTimer > 60f)
-        // {
-        //     stateChanged = true;
-        //     currentState = HandState.SettingDown;
+        if (stateTimer > 60f)
+        {
+            stateChanged = true;
+            currentState = HandState.SettingDown;
 
-        //     Debug.Log("Hand: Next state=SettingsDown");
-        // }
+            Debug.Log("Hand: Next state=SettingsDown");
+        }
     }
 
     void ThrowAndCatch() { /* ... */ }
