@@ -4,15 +4,22 @@ public class Billboard : MonoBehaviour
 {
     public Vector3 rotationAxis = new(0, 1, 0);
 
-    private Camera mainCam;
+    private Transform mainCamTransform;
+    private Transform thisTransform;
+    private Renderer thisRenderer;
 
     void Start()
     {
-        mainCam = Camera.main;
+        mainCamTransform = Camera.main.transform;
+        thisTransform = transform;
+        thisRenderer = GetComponentInChildren<Renderer>();
     }
 
     void Update()
     {
-        transform.LookAt(mainCam.transform.position + rotationAxis * -2f, transform.parent.up);
+        if (thisRenderer.isVisible)
+        {
+            thisTransform.LookAt(mainCamTransform.position + rotationAxis * -2f, thisTransform.parent.up);
+        }
     }
 }
