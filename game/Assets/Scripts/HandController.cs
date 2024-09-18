@@ -47,7 +47,7 @@ public class HandController : MonoBehaviour
     private float initialCamDampeningX, initialCamDampeningY, initialCamDampeningZ;
 
     private float stateTimer;
-    private bool stateChanged;
+    private bool stateChanged = true;
 
     void Start()
     {
@@ -92,9 +92,20 @@ public class HandController : MonoBehaviour
 
     void MovingOver()
     {
-        transform.position = Vector3.MoveTowards(transform.position, handInTheSkyPosition, speed * Time.deltaTime);
+        if (stateChanged)
+        {
+            stateChanged = false;
+            stateTimer = 0f;
+        }
+
+        stateTimer += Time.deltaTime;
+
+        transform.position = Vector3.Lerp(handOutsidePosition, handInTheSkyPosition, movementCurve.Evaluate(stateTimer * 0.075f));
+
         if (Vector3.Distance(transform.position, handInTheSkyPosition) < 0.01f)
         {
+            transform.position = handInTheSkyPosition;
+
             currentState = HandState.Descending;
             stateChanged = true;
 
