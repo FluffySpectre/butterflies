@@ -25,6 +25,7 @@ public class HandController : MonoBehaviour
     public Vector3 handOnDomePosition;
     public Vector3 handInTheSkyPosition;
     public CinemachineVirtualCamera mainCamera;
+    public AnimationCurve movementCurve;
 
     private Vector3 initialPosition;
     private Quaternion initialRotation;
@@ -95,6 +96,7 @@ public class HandController : MonoBehaviour
         if (Vector3.Distance(transform.position, handInTheSkyPosition) < 0.01f)
         {
             currentState = HandState.Descending;
+            stateChanged = true;
 
             Debug.Log("Hand: Next state=Descending");
         }
@@ -102,8 +104,17 @@ public class HandController : MonoBehaviour
 
     void Descend()
     {
+        if (stateChanged)
+        {
+            stateChanged = false;
+            stateTimer = 0f;
+        }
+
+        stateTimer += Time.deltaTime;
+
         var targetPosition = new Vector3(transform.position.x, handOnDomePosition.y, transform.position.z);
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+        transform.position = Vector3.Lerp(handInTheSkyPosition, handOnDomePosition, movementCurve.Evaluate(stateTimer * 0.15f));
 
         if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
         {
@@ -244,6 +255,7 @@ public class HandController : MonoBehaviour
             if (Math.Abs(lerpedDampingX - initialCamDampeningX) < 0.1f)
             {
                 currentState = HandState.Ascending;
+                stateChanged = true;
 
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_XDamping = initialCamDampeningX;
                 mainCamera.GetCinemachineComponent<CinemachineFramingTransposer>().m_YDamping = initialCamDampeningY;
@@ -261,12 +273,19 @@ public class HandController : MonoBehaviour
     }
     void Ascend()
     {
-        var targetPosition = handOutsidePosition;
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
-
-        if (Vector3.Distance(transform.position, targetPosition) < 0.01f)
+        if (stateChanged)
         {
-            transform.position = targetPosition;
+            stateChanged = false;
+            stateTimer = 0f;
+        }
+
+        stateTimer += Time.deltaTime;
+
+        transform.position = Vector3.Lerp(handOnDomePosition, handOutsidePosition, movementCurve.Evaluate(stateTimer * 0.15f));
+
+        if (Vector3.Distance(transform.position, handOutsidePosition) < 0.01f)
+        {
+            transform.position = handOutsidePosition;
 
             // currentState = HandState.Idle;
 
