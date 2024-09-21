@@ -80,20 +80,53 @@ public class GameManager : MonoBehaviour
         var butterflyController = interactor.GetComponentInParent<ButterflyController>();
         butterflyController.controllable = false;
 
-        var flowerCam = flower.transform.parent.Find("Virtual Camera").gameObject;
-        if (interactor.layer == LayerMask.NameToLayer("Player"))
+        // var flowerCam = flower.transform.parent.Find("Virtual Camera").gameObject;
+        // if (interactor.layer == LayerMask.NameToLayer("Player"))
+        // {
+        //     flowerCam.SetActive(true);
+        // }
+
+        // Move closer and look at the flower
+        var startRotation = interactor.transform.rotation;
+        var targetRotation = Quaternion.LookRotation(flower.transform.forward, Vector3.up);
+        var startPosition = interactor.transform.position;
+        var targetPosition = flower.transform.position;
+
+        float lerpSpeed = 1.0f;
+        float lerpProgress = 0f;
+
+        while (lerpProgress < 1.0f)
         {
-            flowerCam.SetActive(true);
+            lerpProgress += Time.deltaTime * lerpSpeed;
+            interactor.transform.SetPositionAndRotation(
+                Vector3.Lerp(startPosition, targetPosition, lerpProgress),
+                Quaternion.Slerp(startRotation, targetRotation, lerpProgress)
+            );
+            yield return null;
         }
 
-        yield return new WaitForSeconds(5);
+        // TODO: do nectar stuff
 
-        if (interactor.layer == LayerMask.NameToLayer("Player"))
+        yield return new WaitForSeconds(3);
+
+        // Turn away from the flower
+        startRotation = interactor.transform.rotation;
+        targetRotation = Quaternion.LookRotation(-flower.transform.forward, Vector3.up);
+        lerpSpeed = 1.0f;
+        lerpProgress = 0f;
+        while (lerpProgress < 1.0f)
         {
-            flowerCam.SetActive(false);
+            lerpProgress += Time.deltaTime * lerpSpeed;
+            interactor.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, lerpProgress);
+            yield return null;
         }
+
+        // if (interactor.layer == LayerMask.NameToLayer("Player"))
+        // {
+        //     flowerCam.SetActive(false);
+        // }
         
-        yield return new WaitForSeconds(2);
+        // yield return new WaitForSeconds(2);
 
         butterflyController.controllable = true;
     }
