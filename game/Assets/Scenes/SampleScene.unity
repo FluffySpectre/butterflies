@@ -11922,6 +11922,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  groundParticles: {fileID: 2142448677}
+  onHandSequenceComplete:
+    m_PersistentCalls:
+      m_Calls: []
   liftDuration: 10
   liftCurve:
     serializedVersion: 2
@@ -11947,7 +11951,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  groundParticles: {fileID: 2142448677}
 --- !u!1 &645821514
 GameObject:
   m_ObjectHideFlags: 0
@@ -28853,7 +28856,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerController: {fileID: 1436888643}
-  hand: {fileID: 644222268}
+  hand: {fileID: 644222270}
   timeBeforeFirstHandEvent: 60
 --- !u!114 &1471287084
 MonoBehaviour:

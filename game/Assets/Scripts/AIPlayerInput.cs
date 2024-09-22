@@ -12,9 +12,24 @@ public class AIPlayerInput : MonoBehaviour
     private float collisionTime;
     private bool isColliding = false;
 
+    private float minTimeUntilPickANewTargetStartup;
+    private float maxTimeUntilPickANewTargetStartup;
+    private float idleTimeUntilNewTargetStartup;
+
+    public void ResetValues()
+    {
+        minTimeUntilPickANewTarget = minTimeUntilPickANewTargetStartup;
+        maxTimeUntilPickANewTarget = maxTimeUntilPickANewTargetStartup;
+        idleTimeUntilNewTarget = idleTimeUntilNewTargetStartup;
+    }
+
     private void Awake()
     {
         butterflyController = GetComponent<ButterflyController>();
+
+        minTimeUntilPickANewTargetStartup = minTimeUntilPickANewTarget;
+        maxTimeUntilPickANewTargetStartup = maxTimeUntilPickANewTarget;
+        idleTimeUntilNewTargetStartup = idleTimeUntilNewTarget;
     }
 
     private void Update()

@@ -1,6 +1,7 @@
 using System;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class HandController : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class HandController : MonoBehaviour
         Idle2,
         Throwing,
         SettingDown,
-        Ascending
+        Ascending,
+        ActivationIdle,
     }
 
     public HandState currentState = HandState.MovingOver;
@@ -26,6 +28,8 @@ public class HandController : MonoBehaviour
     public Vector3 handInTheSkyPosition;
     public CinemachineVirtualCamera mainCamera;
     public AnimationCurve movementCurve;
+    public ParticleSystem groundParticles;
+    public UnityEvent onHandSequenceComplete;
 
     private Vector3 initialPosition;
     private Quaternion initialRotation;
@@ -41,8 +45,6 @@ public class HandController : MonoBehaviour
     private Vector3 liftStartPosition;
     private Vector3 liftEndPosition;
     public AnimationCurve liftCurve;
-
-    public ParticleSystem groundParticles;
 
     private float initialCamDampeningX, initialCamDampeningY, initialCamDampeningZ;
 
@@ -298,7 +300,9 @@ public class HandController : MonoBehaviour
         {
             transform.position = handOutsidePosition;
 
-            // currentState = HandState.Idle;
+            onHandSequenceComplete.Invoke();
+
+            currentState = HandState.ActivationIdle;
 
             // Debug.Log("Hand: Next state=Idle");
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public ButterflyController playerController;
-    public GameObject hand;
+    public HandController hand;
     public event Action OnHandUpdated;
     public float timeBeforeFirstHandEvent = 20f;
 
@@ -16,11 +16,13 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         GameEvents.Instance.OnApproachFlower += OnApproachFlower;
+        hand.onHandSequenceComplete.AddListener(OnHandSequenceComplete);
     }
 
     void OnDestroy()
     {
         GameEvents.Instance.OnApproachFlower -= OnApproachFlower;
+        hand.onHandSequenceComplete.RemoveListener(OnHandSequenceComplete);
     }
 
     // Update is called once per frame
@@ -42,7 +44,12 @@ public class GameManager : MonoBehaviour
  
     private void ActivateHand()
     {
-        hand.SetActive(true);
+        hand.gameObject.SetActive(true);
+    }
+
+    private void OnHandSequenceComplete()
+    {
+        SetButterflyAlertState(false);
     }
 
     private void FindAllAIButterflies()
@@ -59,13 +66,21 @@ public class GameManager : MonoBehaviour
 
             if (b.TryGetComponent(out AIPlayerInput aiPlayerInput))
             {
-                b.speed = 100f;
-                b.turnSpeed = 100f;
-                b.pitchSpeed = 90f;
-                b.maxWingFlapSpeed = 20f;
+                if (alerted)
+                {
+                    b.speed = 100f;
+                    b.turnSpeed = 100f;
+                    b.pitchSpeed = 90f;
+                    b.maxWingFlapSpeed = 20f;
 
-                aiPlayerInput.minTimeUntilPickANewTarget = 1f;
-                aiPlayerInput.maxTimeUntilPickANewTarget = 5f;
+                    aiPlayerInput.minTimeUntilPickANewTarget = 1f;
+                    aiPlayerInput.maxTimeUntilPickANewTarget = 5f;
+                }
+                else
+                {
+                    b.ResetValues();
+                    aiPlayerInput.ResetValues();
+                }
             }
         }
     }

@@ -49,10 +49,30 @@ public class ButterflyController : MonoBehaviour
     // Rigidbody
     private Rigidbody rb;
 
+    // Saved values
+    private float speedOriginal;
+    private float turnSpeedOriginal;
+    private float pitchSpeedOriginal;
+    private float maxWingFlapSpeedOriginal;
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
+
+        speedOriginal = speed;
+        turnSpeedOriginal = turnSpeed;
+        pitchSpeedOriginal = pitchSpeed;
+        maxWingFlapSpeedOriginal = maxWingFlapSpeed;
+    }
+
+    public void ResetValues()
+    {
+        speed = speedOriginal;
+        turnSpeed = turnSpeedOriginal;
+        pitchSpeed = pitchSpeedOriginal;
+        maxWingFlapSpeed = maxWingFlapSpeedOriginal;
     }
 
     public void ApplyInput(float horizontal, float vertical)
