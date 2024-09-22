@@ -87,10 +87,11 @@ public class GameManager : MonoBehaviour
         // }
 
         // Move closer and look at the flower
+        var landingSpot = flower.transform.parent.Find("LandingSpot");
         var startRotation = interactor.transform.rotation;
-        var targetRotation = Quaternion.LookRotation(flower.transform.forward, Vector3.up);
+        var targetRotation = Quaternion.LookRotation(landingSpot.forward, landingSpot.up);
         var startPosition = interactor.transform.position;
-        var targetPosition = flower.transform.position;
+        var targetPosition = landingSpot.position;
 
         float lerpSpeed = 1.0f;
         float lerpProgress = 0f;
@@ -107,11 +108,12 @@ public class GameManager : MonoBehaviour
 
         // TODO: do nectar stuff
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2);
 
         // Turn away from the flower
         startRotation = interactor.transform.rotation;
         targetRotation = Quaternion.LookRotation(-flower.transform.forward, Vector3.up);
+        // targetRotation = Quaternion.LookRotation(landingSpot.transform.forward + new Vector3(2f, 0f, 0f), landingSpot.right);
         lerpSpeed = 1.0f;
         lerpProgress = 0f;
         while (lerpProgress < 1.0f)
