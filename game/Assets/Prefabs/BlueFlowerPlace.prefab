@@ -1524,6 +1524,7 @@ Transform:
   - {fileID: 2227544899891675055}
   - {fileID: 1203259121933557995}
   - {fileID: 9047306303218138986}
+  - {fileID: 4951277317239079568}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3025121310631218229
@@ -1959,6 +1960,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &8312728053176486533
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4951277317239079568}
+  m_Layer: 0
+  m_Name: LandingSpotUpsideDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4951277317239079568
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8312728053176486533}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.006043741, y: -0.54320735, z: 0.8395765, w: 0.000673999}
+  m_LocalPosition: {x: -0.85, y: 20, z: 0.59}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4527829491930691000}
+  m_LocalEulerAnglesHint: {x: 114.2, y: -181.521, z: -1.076}
 --- !u!1 &8431278352083971199
 GameObject:
   m_ObjectHideFlags: 0

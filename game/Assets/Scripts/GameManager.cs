@@ -102,14 +102,16 @@ public class GameManager : MonoBehaviour
         // }
 
         // Move closer and look at the flower
-        var landingSpot = flower.transform.parent.Find("LandingSpot");
+        var landingSpotName = flower.transform.up.y >= 0f ? "LandingSpot" : "LandingSpotUpsideDown";
+        var landingSpot = flower.transform.parent.Find(landingSpotName);
         var startRotation = interactor.transform.rotation;
+
         var targetRotation = Quaternion.LookRotation(landingSpot.forward, landingSpot.up);
         var startPosition = interactor.transform.position;
         var targetPosition = landingSpot.position;
 
-        float lerpSpeed = 1.0f;
-        float lerpProgress = 0f;
+        var lerpSpeed = 1.0f;
+        var lerpProgress = 0f;
 
         while (lerpProgress < 1.0f)
         {
